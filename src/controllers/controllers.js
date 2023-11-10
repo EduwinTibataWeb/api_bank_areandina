@@ -116,20 +116,35 @@ const setTransaccion = async (req, res) => {
         res.send(error.message);
     }
 };
-const setTransaccion2 = async (req, res) => {
+
+const deleteTransaccion = async (req, res) => {
     try{
+        const {id}=req.params;
+        const connection = await getConnection();
+        result = await connection.query('DELETE FROM transacciones WHERE ID_Movimiento = ?', id);
+        res.json({message: "Usuario Eliminado" });
+    }catch(error){
+        res.status(500);
+        res.send(error.message);
+    }
+};
+
+const updateTransaccion = async (req, res) => {
+    try{
+        const {id}=req.params;
         const { ID_Movimiento, Usuario_origen_id, Usuario_destino_id, Tipo_Movimiento, Fecha_Movimiento, Saldo_Anterior, Saldo_Movimiento, Saldo_Disponible} = req.body;
 
-        if(Usuario_origen_id  == undefined || Usuario_destino_id  == undefined || Tipo_Movimiento  == undefined || Fecha_Movimiento  == undefined || Saldo_Anterior  == undefined || Saldo_Movimiento  == undefined  || Saldo_Disponible  == undefined ){
+        if(ID_Movimiento == undefined || Usuario_origen_id  == undefined || Usuario_destino_id  == undefined || Tipo_Movimiento  == undefined || Fecha_Movimiento  == undefined || Saldo_Anterior  == undefined || Saldo_Movimiento  == undefined  || Saldo_Disponible  == undefined ){
             res.status(400).json({message:"Bad Request. Please fill all field."});
         }
 
         const transaccion = { ID_Movimiento, Usuario_origen_id, Usuario_destino_id, Tipo_Movimiento, Fecha_Movimiento, Saldo_Anterior, Saldo_Movimiento, Saldo_Disponible};
+            
         const connection = await getConnection();
-        await connection.query("INSERT INTO transacciones SET ?", transaccion);
-        res.json({message: "Transaccio Agregado" });
+        result = await connection.query('UPDATE transacciones SET ? WHERE ID_Movimiento = ?', [transaccion, id]);
+        res.json({message: "Usuario Actualizado" });
 
-    } catch(error){
+    }catch(error){
         res.status(500);
         res.send(error.message);
     }
@@ -144,5 +159,6 @@ export const methods={
     getTransacciones,
     getTransaccion,
     setTransaccion,
-    setTransaccion2
+    deleteTransaccion,
+    updateTransaccion
 }

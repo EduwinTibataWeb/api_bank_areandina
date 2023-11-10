@@ -11,6 +11,9 @@ router.put("/users/:id", controllers.updateUser);
 
 router.get("/transacciones/", controllers.getTransacciones);
 router.get("/transacciones/:id", controllers.getTransaccion);
-router.post("/transacciones/", controllers.getTransaccion);
+router.post("/transacciones/", controllers.setTransaccion);
+router.delete("/transacciones/:id", controllers.deleteTransaccion);
+router.put("/transacciones/:id", controllers.updateTransaccion);
+
 
 module.exports = router;
