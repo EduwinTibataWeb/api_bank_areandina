@@ -8,9 +8,11 @@ router.get("/users/:id", controllers.getUser);
 router.post("/users/", controllers.setUser);
 router.delete("/users/:id", controllers.deleteUser);
 router.put("/users/:id", controllers.updateUser);
+router.get("/users/:id/:pass", controllers.getUserLogin);
 
 router.get("/transacciones/", controllers.getTransacciones);
 router.get("/transacciones/:id", controllers.getTransaccion);
+router.get("/transacciones/user/:id", controllers.getTransaccionesUser);
 router.post("/transacciones/", controllers.setTransaccion);
 router.delete("/transacciones/:id", controllers.deleteTransaccion);
 router.put("/transacciones/:id", controllers.updateTransaccion);

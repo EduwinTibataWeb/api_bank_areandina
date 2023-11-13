@@ -23,6 +23,18 @@ const getUser = async (req, res) => {
     }
 };
 
+const getUserLogin = async (req, res) => {
+    try{
+        const { id, pass } = req.params; 
+        const connection = await getConnection();
+        const result = await connection.query('SELECT * FROM usuario WHERE ID_Usuario = ? AND Contrasena = ?', [id, pass]);
+        res.json(result);
+    }catch(error){
+        res.status(500);
+        res.send(error.message);
+    }
+};
+
 const setUser = async (req, res) => {
     try{
         const { ID_Usuario, Nombre, Contrasena, Correo, Saldo, Fecha_Activacion} = req.body;
@@ -98,6 +110,18 @@ const getTransaccion = async (req, res) => {
     }
 };
 
+const getTransaccionesUser = async (req, res) => {
+    try{
+        const {id}=req.params;
+        const connection = await getConnection();
+        const result = await connection.query('SELECT * FROM transacciones WHERE Usuario_origen_id = ? OR Usuario_destino_id = ?',  [id, id]);
+        res.json(result);
+    }catch(error){
+        res.status(500);
+        res.send(error.message);
+    }
+};
+
 const setTransaccion = async (req, res) => {
     try{
         const { ID_Movimiento, Usuario_origen_id, Usuario_destino_id, Tipo_Movimiento, Fecha_Movimiento, Saldo_Anterior, Saldo_Movimiento, Saldo_Disponible} = req.body;
@@ -160,5 +184,7 @@ export const methods={
     getTransaccion,
     setTransaccion,
     deleteTransaccion,
-    updateTransaccion
+    updateTransaccion,
+    getTransaccionesUser,
+    getUserLogin
 }
