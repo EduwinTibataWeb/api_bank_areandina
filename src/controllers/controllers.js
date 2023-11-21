@@ -1,33 +1,60 @@
 import {getConnection} from "../database/database";
 
-const getUsers = async (req, res) => {
-    try{
-        const connection = await getConnection();
-        const result = await connection.query('SELECT * FROM usuario');
-        res.json(result);
-    }catch(error){
-        res.status(500);
-        res.send(error.message);
-    }
+const getTablaDatos = async (req, res) => {
+    const connection = await getConnection();
+    const table =req.params.table;
+
+    const sql_get='SELECT * from '+ table;
+    connection.query(sql_get, (error,results,fields) => {
+        if(error){
+            throw error;
+        }
+        if(results.length > 0){
+            res.json(results)
+        }
+        else{
+            res.json([{"respuesta":"not results"}])
+        }
+    })
 };
 
-const getUser = async (req, res) => {
-    try{
-        const {id}=req.params;
-        const connection = await getConnection();
-        const result = await connection.query('SELECT * FROM usuario WHERE ID_Usuario = ?', id);
-        res.json(result);
-    }catch(error){
-        res.status(500);
-        res.send(error.message);
-    }
+const getTablaDato = async (req, res) => {
+    const connection = await getConnection();
+    const id=req.params.id;
+    const table=req.params.table;
+    const sql_get= 'SELECT * from '+ table + ' WHERE Id = '+ id;
+    connection.query(sql_get, (error,results,fields) => {
+        if(error){
+            throw error;
+        }
+        if(results.length > 0){
+            res.json(results)
+        }
+        else{
+            res.json([{"respuesta":"not results"}])
+        }
+    })
+};
+
+const postTablaId = async (req, res)=>{
+    const tabla= req.params.table
+    const sql_post= 'INSERT INTO '+ tabla +' SET ?'
+    const connection = await getConnection();
+    connection.query(sql_post,[req.body], error => {
+        if(error){
+            throw error;
+        }
+        else{
+            res.send("Dato guardado");
+        }
+    })
 };
 
 const getUserLogin = async (req, res) => {
     try{
         const { id, pass } = req.params; 
         const connection = await getConnection();
-        const result = await connection.query('SELECT * FROM usuario WHERE ID_Usuario = ? AND Contrasena = ?', [id, pass]);
+        const result = await connection.query('SELECT * FROM usuarios WHERE Id = ? AND Contrasena = ?', [id, pass]);
         res.json(result);
     }catch(error){
         res.status(500);
@@ -35,86 +62,47 @@ const getUserLogin = async (req, res) => {
     }
 };
 
-const setUser = async (req, res) => {
-    try{
-        const { ID_Usuario, Nombre, Contrasena, Correo, Saldo, Fecha_Activacion} = req.body;
 
-        if(ID_Usuario == undefined || Nombre  == undefined || Contrasena  == undefined || Correo  == undefined || Saldo  == undefined || Fecha_Activacion  == undefined){
-            res.status(400).json({message:"Bad Request. Please fill all field."});
+const deleteTablaDato = async (req, res) => {
+    const connection = await getConnection();
+    const id=req.params.id;
+    const table=req.params.table;
+    const sql_get= 'DELETE FROM '+ table + ' WHERE Id = '+ id;
+    connection.query(sql_get, (error,results,fields) => {
+        if(error){
+            throw error;
         }
-
-        const usuario = { ID_Usuario, Nombre, Contrasena, Correo, Saldo, Fecha_Activacion};
-        const connection = await getConnection();
-        await connection.query("INSERT INTO usuario SET ?", usuario);
-        res.json({message: "Usuario Agregado" });
-
-    } catch(error){
-        res.status(500);
-        res.send(error.message);
-    }
-};
-
-const deleteUser = async (req, res) => {
-    try{
-        const {id}=req.params;
-        const connection = await getConnection();
-        result = await connection.query('DELETE FROM usuario WHERE ID_Usuario = ?', id);
-        res.json({message: "Usuario Eliminado" });
-    }catch(error){
-        res.status(500);
-        res.send(error.message);
-    }
-};
-
-const updateUser = async (req, res) => {
-    try{
-        const {id}=req.params;
-        const { ID_Usuario, Nombre, Contrasena, Correo, Saldo, Fecha_Activacion} = req.body;
-        const usuario = { ID_Usuario, Nombre, Contrasena, Correo, Saldo, Fecha_Activacion};
-
-        if(ID_Usuario == undefined || Nombre  == undefined || Contrasena  == undefined || Correo  == undefined || Saldo  == undefined || Fecha_Activacion  == undefined){
-            res.status(400).json({message:"Bad Request. Please fill all field."});
+        if(results.length > 0){
+            res.json(results)
         }
-    
-        const connection = await getConnection();
-        result = await connection.query('UPDATE usuario SET ? WHERE ID_Usuario = ?', [usuario, id]);
-        res.json({message: "Usuario Actualizado" });
+        else{
+            res.json([{"respuesta":"not results"}])
+        }
+    })
+};
 
-    }catch(error){
-        res.status(500);
-        res.send(error.message);
-    }
+const updateTablaId = async (req, res) => {
+    const { id } = req.params;
+    const { table } = req.params;
+    const sql_put = 'UPDATE ?? SET ? WHERE Id = ?'; 
+    const connection = await getConnection();
+
+    connection.query(sql_put, [table, req.body, id], error => {
+        if (error) {
+            throw error;
+        } else {
+            res.send("actualizado");
+        }
+    });
 };
 
 
-const getTransacciones = async (req, res) => {
-    try{
-        const connection = await getConnection();
-        const result = await connection.query('SELECT * FROM transacciones');
-        res.json(result);
-    }catch(error){
-        res.status(500);
-        res.send(error.message);
-    }
-};
-
-const getTransaccion = async (req, res) => {
-    try{
-        const {id}=req.params;
-        const connection = await getConnection();
-        const result = await connection.query('SELECT * FROM transacciones WHERE ID_Movimiento = ?', id);
-        res.json(result);
-    }catch(error){
-        res.status(500);
-        res.send(error.message);
-    }
-};
 
 const getTransaccionesUser = async (req, res) => {
     try{
         const {id}=req.params;
         const connection = await getConnection();
-        const result = await connection.query('SELECT * FROM transacciones WHERE Usuario_origen_id = ? OR Usuario_destino_id = ?',  [id, id]);
+        const result = await connection.query('SELECT * FROM transacciones WHERE Usuario_origen_id = ? OR Usuario_destino_id = ? ORDER BY Id DESC',  [id, id]);
         res.json(result);
     }catch(error){
         res.status(500);
@@ -122,69 +110,34 @@ const getTransaccionesUser = async (req, res) => {
     }
 };
 
-const setTransaccion = async (req, res) => {
-    try{
-        const { ID_Movimiento, Usuario_origen_id, Usuario_destino_id, Tipo_Movimiento, Fecha_Movimiento, Saldo_Anterior, Saldo_Movimiento, Saldo_Disponible} = req.body;
-
-        if(Usuario_origen_id  == undefined || Usuario_destino_id  == undefined || Tipo_Movimiento  == undefined || Fecha_Movimiento  == undefined || Saldo_Anterior  == undefined || Saldo_Movimiento  == undefined  || Saldo_Disponible  == undefined ){
-            res.status(400).json({message:"Bad Request. Please fill all field."});
-        }
-
-        const transaccion = { ID_Movimiento, Usuario_origen_id, Usuario_destino_id, Tipo_Movimiento, Fecha_Movimiento, Saldo_Anterior, Saldo_Movimiento, Saldo_Disponible};
-        const connection = await getConnection();
-        await connection.query("INSERT INTO transacciones SET ?", transaccion);
-        res.json({message: "Transaccio Agregado" });
-
-    } catch(error){
-        res.status(500);
-        res.send(error.message);
-    }
-};
-
-const deleteTransaccion = async (req, res) => {
+const deleteTransaccionesUser = async (req, res) => {
     try{
         const {id}=req.params;
         const connection = await getConnection();
-        result = await connection.query('DELETE FROM transacciones WHERE ID_Movimiento = ?', id);
-        res.json({message: "Usuario Eliminado" });
+
+        // Eliminar transacciones
+        const consultaEliminarTransacciones = 'DELETE FROM transacciones WHERE Usuario_origen_id = ? OR Usuario_destino_id = ?';
+        const resultadoTransacciones = await connection.query(consultaEliminarTransacciones, [id, id]);
+
+        // Eliminar usuario
+        const consultaEliminarUsuario = 'DELETE FROM usuarios WHERE id = ?';
+        const resultadoUsuario = await connection.query(consultaEliminarUsuario, [id]);
+
+        res.json({resultadoTransacciones, resultadoUsuario});
     }catch(error){
         res.status(500);
         res.send(error.message);
     }
 };
 
-const updateTransaccion = async (req, res) => {
-    try{
-        const {id}=req.params;
-        const { ID_Movimiento, Usuario_origen_id, Usuario_destino_id, Tipo_Movimiento, Fecha_Movimiento, Saldo_Anterior, Saldo_Movimiento, Saldo_Disponible} = req.body;
-
-        if(ID_Movimiento == undefined || Usuario_origen_id  == undefined || Usuario_destino_id  == undefined || Tipo_Movimiento  == undefined || Fecha_Movimiento  == undefined || Saldo_Anterior  == undefined || Saldo_Movimiento  == undefined  || Saldo_Disponible  == undefined ){
-            res.status(400).json({message:"Bad Request. Please fill all field."});
-        }
-
-        const transaccion = { ID_Movimiento, Usuario_origen_id, Usuario_destino_id, Tipo_Movimiento, Fecha_Movimiento, Saldo_Anterior, Saldo_Movimiento, Saldo_Disponible};
-            
-        const connection = await getConnection();
-        result = await connection.query('UPDATE transacciones SET ? WHERE ID_Movimiento = ?', [transaccion, id]);
-        res.json({message: "Usuario Actualizado" });
-
-    }catch(error){
-        res.status(500);
-        res.send(error.message);
-    }
-};
 
 export const methods={
-    getUsers,
-    getUser,
-    setUser,
-    deleteUser,
-    updateUser,
-    getTransacciones,
-    getTransaccion,
-    setTransaccion,
-    deleteTransaccion,
-    updateTransaccion,
+    getTablaDatos,
+    getTablaDato,
+    postTablaId,
+    deleteTablaDato,
+    updateTablaId,
     getTransaccionesUser,
-    getUserLogin
+    getUserLogin,
+    deleteTransaccionesUser
 }

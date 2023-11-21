@@ -3,19 +3,15 @@ const { Router } = require('express');
 import { methods as controllers } from '../controllers/controllers';
 const router = Router()
 
-router.get("/users/", controllers.getUsers);
-router.get("/users/:id", controllers.getUser);
-router.post("/users/", controllers.setUser);
-router.delete("/users/:id", controllers.deleteUser);
-router.put("/users/:id", controllers.updateUser);
-router.get("/users/:id/:pass", controllers.getUserLogin);
+router.get("/:table/", controllers.getTablaDatos);
+router.get("/:table/:id", controllers.getTablaDato);
+router.post("/:table/", controllers.postTablaId);
+router.delete("/:table/:id", controllers.deleteTablaDato);
+router.put("/:table/:id", controllers.updateTablaId);
+router.get("/usuarios/:id/:pass", controllers.getUserLogin);
 
-router.get("/transacciones/", controllers.getTransacciones);
-router.get("/transacciones/:id", controllers.getTransaccion);
-router.get("/transacciones/user/:id", controllers.getTransaccionesUser);
-router.post("/transacciones/", controllers.setTransaccion);
-router.delete("/transacciones/:id", controllers.deleteTransaccion);
-router.put("/transacciones/:id", controllers.updateTransaccion);
+router.get("/transacciones/usuarios/:id", controllers.getTransaccionesUser);
+router.delete("/transacciones/delete/user/:id", controllers.deleteTransaccionesUser);
 
 
 module.exports = router;
